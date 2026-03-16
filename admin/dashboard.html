@@ -675,7 +675,7 @@
     <script>
         // Verificação de sessão
         if (sessionStorage.getItem('admin_logged') !== 'true') {
-            window.location.href = 'index.html';
+            window.location.href = '/admin/index.html';
         }
 
         // Data atual
@@ -821,7 +821,7 @@
 
         function logout() {
             sessionStorage.removeItem('admin_logged');
-            window.location.href = 'index.html';
+            window.location.href = '/admin/index.html';
         }
 
         document.getElementById('modal-overlay').addEventListener('click', e => {

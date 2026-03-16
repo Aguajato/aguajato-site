@@ -338,12 +338,6 @@
                                 style="display:flex; align-items:center; gap:.6rem; font-size:.9rem; color:var(--slate-700);">
                                 <span
                                     style="width:20px; height:20px; background:var(--green-light); color:var(--green); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.7rem; font-weight:900;">✓</span>
-                                Volumes de 8.000 a 36.000+ litros (múltiplas viagens)
-                            </li>
-                            <li
-                                style="display:flex; align-items:center; gap:.6rem; font-size:.9rem; color:var(--slate-700);">
-                                <span
-                                    style="width:20px; height:20px; background:var(--green-light); color:var(--green); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:.7rem; font-weight:900;">✓</span>
                                 Orçamento imediato baseado no cálculo de volume
                             </li>
                         </ul>
@@ -354,10 +348,23 @@
                         </div>
                     </div>
                     <div>
-                        <div
-                            style="border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); aspect-ratio:4/3;">
-                            <img src="img/servico-piscina.jpg" alt="Piscina com água cristalina"
-                                style="width:100%; height:100%; object-fit:cover;" loading="lazy">
+                        <div class="service-carousel-container"
+                            style="position:relative; border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); aspect-ratio:4/3;">
+                            <div class="service-carousel-slides" style="display: flex; height: 100%; transition: transform 0.8s ease-in-out;">
+                                <img src="img/Cópia de Aguajato (17).jpg" alt="Enchimento de piscina" style="width: 100%; height: 100%; object-fit: cover; flex-shrink: 0;">
+                                <img src="img/Captura de Tela 2026-03-16 às 14.51.54.png" alt="Água cristalina para piscina" style="width: 100%; height: 100%; object-fit: cover; flex-shrink: 0;">
+                                <img src="img/Captura de Tela 2026-03-16 às 14.52.25.png" alt="Caminhão pipa Aguajato" style="width: 100%; height: 100%; object-fit: cover; flex-shrink: 0;">
+                                <!-- Clone for infinite scroll -->
+                                <img src="img/Cópia de Aguajato (17).jpg" alt="Enchimento de piscina Clone" aria-hidden="true" style="width: 100%; height: 100%; object-fit: cover; flex-shrink: 0;">
+                            </div>
+
+                            <!-- Botões de Navegação -->
+                            <button class="service-carousel-prev" style="position: absolute; top: 50%; left: 0.5rem; transform: translateY(-50%); background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 36px; height: 36px; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: background 0.2s;" aria-label="Anterior">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                            </button>
+                            <button class="service-carousel-next" style="position: absolute; top: 50%; right: 0.5rem; transform: translateY(-50%); background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 36px; height: 36px; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2); transition: background 0.2s;" aria-label="Próximo">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+                            </button>
                         </div>
                         <div class="card" style="margin-top:1.25rem; background:var(--brand-bg);">
                             <p
@@ -638,6 +645,96 @@
         // Enter nos inputs dispara o cálculo
         document.addEventListener('keydown', e => {
             if (e.key === 'Enter') calcular();
+        });
+
+        // Lógica do Carrossel Secundário
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.querySelector('.service-carousel-container');
+            if(!container) return; // Segurança
+
+            const slidesTrack = document.querySelector('.service-carousel-slides');
+            const prevBtn = document.querySelector('.service-carousel-prev');
+            const nextBtn = document.querySelector('.service-carousel-next');
+            const totalSlides = slidesTrack.children.length - 1; 
+            
+            let currentIndex = 0;
+            let autoSlideInterval;
+            let isTransitioning = false;
+
+            const updateCarousel = (instant = false) => {
+                if(instant) {
+                    slidesTrack.style.transition = 'none';
+                } else {
+                    slidesTrack.style.transition = 'transform 0.8s ease-in-out';
+                }
+                slidesTrack.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                if(instant) slidesTrack.offsetHeight;
+            };
+
+            const nextSlide = () => {
+                if(isTransitioning) return;
+                isTransitioning = true;
+                currentIndex++;
+                updateCarousel();
+
+                if(currentIndex === totalSlides) {
+                    setTimeout(() => {
+                        currentIndex = 0;
+                        updateCarousel(true);
+                        isTransitioning = false;
+                    }, 800);
+                } else {
+                    setTimeout(() => isTransitioning = false, 800);
+                }
+            };
+
+            const prevSlide = () => {
+                if(isTransitioning) return;
+                isTransitioning = true;
+                
+                if(currentIndex === 0) {
+                    currentIndex = totalSlides;
+                    updateCarousel(true);
+                    
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            currentIndex = totalSlides - 1;
+                            updateCarousel();
+                            setTimeout(() => isTransitioning = false, 800);
+                        });
+                    });
+                } else {
+                    currentIndex--;
+                    updateCarousel();
+                    setTimeout(() => isTransitioning = false, 800);
+                }
+            };
+
+            const startAutoSlide = () => {
+                autoSlideInterval = setInterval(nextSlide, 2000); 
+            };
+
+            const stopAutoSlide = () => {
+                clearInterval(autoSlideInterval);
+            };
+
+            container.addEventListener('mouseenter', () => {
+                stopAutoSlide();
+                prevBtn.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+            });
+
+            container.addEventListener('mouseleave', () => {
+                startAutoSlide();
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+            });
+
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            startAutoSlide();
         });
     </script>
 </body>

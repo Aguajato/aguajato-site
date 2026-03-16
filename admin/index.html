@@ -229,7 +229,7 @@
 
         // Redireciona se já logado
         if (sessionStorage.getItem('admin_logged') === 'true') {
-            window.location.href = 'dashboard.html';
+            window.location.href = '/admin/dashboard.html';
         }
 
         document.getElementById('login-form').addEventListener('submit', function (e) {
@@ -239,7 +239,7 @@
             const err = document.getElementById('error-msg');
             if (u === CREDENTIALS.user && p === CREDENTIALS.pass) {
                 sessionStorage.setItem('admin_logged', 'true');
-                window.location.href = 'dashboard.html';
+                window.location.href = '/admin/dashboard.html';
             } else {
                 err.style.display = 'block';
                 document.getElementById('pass').value = '';
