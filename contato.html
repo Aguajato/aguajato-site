@@ -138,7 +138,8 @@
                                 style="font-size:1.2rem; font-weight:800; margin-bottom:1.5rem; color:var(--slate-900);">
                                 Informações de Contato</h2>
 
-                            <div class="contact-info-item" style="background:#fef2f2; border:1.5px solid #fca5a5; border-radius:.65rem; padding:1rem; margin-bottom:1.5rem;">
+                            <div class="contact-info-item"
+                                style="background:#fef2f2; border:1.5px solid #fca5a5; border-radius:.65rem; padding:1rem; margin-bottom:1.5rem;">
                                 <div class="contact-info-icon" style="background:#fee2e2; color:#dc2626;">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -148,11 +149,14 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <div class="contact-info-label" style="color:#dc2626;">🚨 Emergência · Fixo 24h / 7 dias</div>
+                                    <div class="contact-info-label" style="color:#dc2626;">🚨 Emergência · Fixo 24h / 7
+                                        dias</div>
                                     <div class="contact-info-value" style="font-size:1.1rem;">
-                                        <a href="tel:+551937879710" style="color:#dc2626; font-weight:800;">(19) 3787-9710</a>
+                                        <a href="tel:+551937879710" style="color:#dc2626; font-weight:800;">(19)
+                                            3787-9710</a>
                                     </div>
-                                    <span style="font-size:.75rem; color:#dc2626; font-weight:600;">Ligue direto — sem espera, 24h por dia</span>
+                                    <span style="font-size:.75rem; color:#dc2626; font-weight:600;">Ligue direto — sem
+                                        espera, 24h por dia</span>
                                 </div>
                             </div>
 
@@ -184,7 +188,9 @@
                                 <div>
                                     <div class="contact-info-label">E-mail</div>
                                     <div class="contact-info-value"><a
-                                            href="mailto:atendimento@aguajato.com.br">atendimento@aguajato.com.br</a>
+                                            href="mailto:atendimento@aguajato.com.br">comercial@aguajato.com.br
+                                            contascomercial@aguajato.com.br
+                                            trabalheconosco@aguajato.com.br</a>
                                     </div>
                                 </div>
                             </div>
@@ -319,30 +325,49 @@
     <div id="footer-placeholder"></div>
 
     <!-- Popup Emergência -->
-    <div id="emergency-popup" style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:1.5rem;">
-        <div style="background:#fff; border-radius:1rem; max-width:420px; width:100%; padding:2rem; box-shadow:0 24px 60px rgba(0,0,0,.35); text-align:center; position:relative; animation: popIn .25s ease;">
-            <div style="width:60px; height:60px; background:#fee2e2; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; font-size:1.75rem;">📞</div>
-            <h2 style="font-size:1.25rem; font-weight:900; color:#0f172a; margin-bottom:.5rem;">Este número é para Emergências</h2>
+    <div id="emergency-popup"
+        style="display:none; position:fixed; inset:0; z-index:9999; background:rgba(15,23,42,.75); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:1.5rem;">
+        <div
+            style="background:#fff; border-radius:1rem; max-width:420px; width:100%; padding:2rem; box-shadow:0 24px 60px rgba(0,0,0,.35); text-align:center; position:relative; animation: popIn .25s ease;">
+            <div
+                style="width:60px; height:60px; background:#fee2e2; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 1.25rem; font-size:1.75rem;">
+                📞</div>
+            <h2 style="font-size:1.25rem; font-weight:900; color:#0f172a; margin-bottom:.5rem;">Este número é para
+                Emergências</h2>
             <p style="font-size:.9rem; color:#475569; line-height:1.65; margin-bottom:1.5rem;">
-                O telefone <strong style="color:#dc2626;">(19) 3787-9710</strong> é destinado a situações de urgência como <strong>falta de água, obras paradas ou crises hídricas</strong>.<br><br>
+                O telefone <strong style="color:#dc2626;">(19) 3787-9710</strong> é destinado a situações de urgência
+                como <strong>falta de água, obras paradas ou crises hídricas</strong>.<br><br>
                 Para orçamentos e agendamentos, preferimos o <strong>WhatsApp</strong> para atender você melhor. 😊
             </p>
             <div style="display:flex; flex-direction:column; gap:.75rem;">
-                <a href="tel:+551937879710" style="display:flex; align-items:center; justify-content:center; gap:.5rem; background:#dc2626; color:#fff; padding:.9rem 1.5rem; border-radius:.5rem; font-weight:800; font-size:.95rem; text-decoration:none;" onclick="closePopup()">
+                <a href="tel:+551937879710"
+                    style="display:flex; align-items:center; justify-content:center; gap:.5rem; background:#dc2626; color:#fff; padding:.9rem 1.5rem; border-radius:.5rem; font-weight:800; font-size:.95rem; text-decoration:none;"
+                    onclick="closePopup()">
                     🚨 Sim, é uma emergência — Ligar agora
                 </a>
-                <a href="https://wa.me/5519997782338?text=Ol%C3%A1%2C%20gostaria%20de%20or%C3%A7amento!" target="_blank" rel="noopener" style="display:flex; align-items:center; justify-content:center; gap:.5rem; background:#25d366; color:#fff; padding:.9rem 1.5rem; border-radius:.5rem; font-weight:700; font-size:.9rem; text-decoration:none;" onclick="closePopup()">
+                <a href="https://wa.me/5519997782338?text=Ol%C3%A1%2C%20gostaria%20de%20or%C3%A7amento!" target="_blank"
+                    rel="noopener"
+                    style="display:flex; align-items:center; justify-content:center; gap:.5rem; background:#25d366; color:#fff; padding:.9rem 1.5rem; border-radius:.5rem; font-weight:700; font-size:.9rem; text-decoration:none;"
+                    onclick="closePopup()">
                     Prefiro falar pelo WhatsApp
                 </a>
-                <button onclick="closePopup()" style="background:none; border:none; color:#94a3b8; font-size:.85rem; cursor:pointer; padding:.5rem;">Cancelar</button>
+                <button onclick="closePopup()"
+                    style="background:none; border:none; color:#94a3b8; font-size:.85rem; cursor:pointer; padding:.5rem;">Cancelar</button>
             </div>
         </div>
     </div>
 
     <style>
         @keyframes popIn {
-            from { opacity:0; transform: scale(.9) translateY(12px); }
-            to   { opacity:1; transform: scale(1) translateY(0); }
+            from {
+                opacity: 0;
+                transform: scale(.9) translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
         }
     </style>
 
@@ -355,7 +380,7 @@
             document.getElementById('emergency-popup').style.display = 'none';
         }
         // Fechar ao clicar fora do card
-        document.getElementById('emergency-popup').addEventListener('click', function(e) {
+        document.getElementById('emergency-popup').addEventListener('click', function (e) {
             if (e.target === this) closePopup();
         });
     </script>
