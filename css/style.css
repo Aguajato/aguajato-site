@@ -1017,26 +1017,38 @@ main {
 }
 
 .card-icon {
-  width: 56px;
-  height: 56px;
-  background: var(--brand-light);
-  color: var(--brand);
-  border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
-  justify-content: center;
-  margin-bottom: 1.25rem;
-  transition: var(--transition);
+  /* Removido background e tamanho fixo da caixa */
+  margin-bottom: 1.5rem;
 }
 
+.card-icon img {
+  width: 72px; /* Aumentado para melhor leitura */
+  height: 72px;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+/* Mantém o estilo de caixa apenas para ícones SVG legados */
 .card-icon svg {
   width: 28px;
   height: 28px;
+  background: var(--brand-light);
+  color: var(--brand);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  box-sizing: content-box;
+  transition: var(--transition);
 }
 
-.card:hover .card-icon {
+.card:hover .card-icon svg {
   background: var(--brand);
   color: #fff;
+}
+
+.card:hover .card-icon img {
+  transform: scale(1.05); /* Leve animação sem mudar a cor */
 }
 
 .card h3 {
@@ -1319,22 +1331,37 @@ textarea.form-control {
 
 /* ── EMERGENCY CARD ── */
 .emergency-card {
-  background: #fff0f0;
-  border: 2px solid #fecaca;
-  border-radius: var(--radius);
-  padding: 2rem;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
   transition: var(--transition);
 }
 
 .emergency-card:hover {
-  box-shadow: var(--shadow);
+  background: #fee2e2;
   border-color: var(--red);
   transform: translateY(-3px);
+  box-shadow: 0 10px 30px -10px rgba(220, 38, 38, 0.2);
 }
 
 .emergency-card .card-icon {
   background: #fee2e2;
   color: var(--red);
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  transition: var(--transition);
+}
+
+.emergency-card .card-icon svg {
+  background: none !important;
+  padding: 0;
+  width: 26px;
+  height: 26px;
+  color: inherit;
 }
 
 .emergency-card:hover .card-icon {
@@ -1342,8 +1369,18 @@ textarea.form-control {
   color: #fff;
 }
 
+.emergency-card:hover .card-icon svg {
+  background: none !important;
+}
+
 .emergency-card h3 {
-  color: #b91c1c;
+  color: var(--red);
+  font-weight: 800;
+}
+
+.emergency-card .card-link {
+  color: var(--red);
+  font-weight: 800;
 }
 
 /* ── RESPONSIVE ── */
