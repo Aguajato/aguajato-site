@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initScrollTop();
     initScrollHeader();
     initServiceCarousel();
+    initFleetCarousel();
   });
 });
 
@@ -210,5 +211,111 @@ function initServiceCarousel() {
     updateCarousel(true);
     startAutoSlide();
   });
+}
+
+/**
+ * Carrossel da Frota (Página Empresa)
+ * - Navega um cartão por vez
+ * - Pausa no hover e retoma no mouseleave
+ * - Esconde setas nos limites
+ * - Para permanentemente no final
+ */
+function initFleetCarousel() {
+  const container = document.querySelector('.carousel-wrapper');
+  const track = document.querySelector('.carousel-track');
+  const prevBtn = container?.querySelector('.service-carousel-prev');
+  const nextBtn = container?.querySelector('.service-carousel-next');
+
+  if (!container || !track || !prevBtn || !nextBtn) return;
+
+  let currentTranslate = 0;
+  let autoSlideInterval;
+
+  const getCardWidth = () => {
+    const card = track.querySelector('.carousel-card');
+    if (!card) return 0;
+    const style = window.getComputedStyle(track);
+    const gap = parseFloat(style.gap) || 16; // 1rem default
+    return card.offsetWidth + gap;
+  };
+
+  const getMaxTranslate = () => {
+    return Math.max(0, track.scrollWidth - container.clientWidth);
+  };
+
+  const toggleButtons = () => {
+    const max = getMaxTranslate();
+    if (currentTranslate <= 0) {
+      prevBtn.classList.add('service-carousel-btn-hidden');
+    } else {
+      prevBtn.classList.remove('service-carousel-btn-hidden');
+    }
+
+    if (currentTranslate >= max - 5) { // margem de erro
+      nextBtn.classList.add('service-carousel-btn-hidden');
+      stopAutoSlide();
+    } else {
+      nextBtn.classList.remove('service-carousel-btn-hidden');
+    }
+  };
+
+  const updatePosition = () => {
+    const max = getMaxTranslate();
+    if (currentTranslate > max) currentTranslate = max;
+    if (currentTranslate < 0) currentTranslate = 0;
+    track.style.transform = `translateX(-${currentTranslate}px)`;
+    toggleButtons();
+  };
+
+  const nextSlide = () => {
+    const step = getCardWidth();
+    const max = getMaxTranslate();
+    if (currentTranslate < max) {
+      currentTranslate += step;
+      updatePosition();
+    }
+  };
+
+  const prevSlide = () => {
+    const step = getCardWidth();
+    if (currentTranslate > 0) {
+      currentTranslate -= step;
+      updatePosition();
+    }
+  };
+
+  const startAutoSlide = () => {
+    const max = getMaxTranslate();
+    if (currentTranslate < max - 5) {
+      autoSlideInterval = setInterval(nextSlide, 4000);
+    }
+  };
+
+  const stopAutoSlide = () => {
+    clearInterval(autoSlideInterval);
+  };
+
+  container.addEventListener('mouseenter', stopAutoSlide);
+  container.addEventListener('mouseleave', () => {
+    const max = getMaxTranslate();
+    if (currentTranslate < max - 5) startAutoSlide();
+  });
+
+  nextBtn.addEventListener('click', () => {
+    stopAutoSlide();
+    nextSlide();
+  });
+  prevBtn.addEventListener('click', () => {
+    stopAutoSlide();
+    prevSlide();
+  });
+
+  window.addEventListener('resize', updatePosition);
+  
+  // Inicialização
+  setTimeout(() => {
+    updatePosition();
+    startAutoSlide();
+  }, 100);
 }
 

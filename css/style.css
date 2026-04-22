@@ -1526,8 +1526,18 @@ textarea.form-control {
 }
 /* ── CAROUSEL ── */
 .carousel-wrapper { overflow: hidden; width: 100%; position: relative; padding: 2rem 0; }
-.carousel-track { display: flex; gap: 1rem; width: max-content; animation: scroll-left 65s linear infinite; }
-.carousel-track:hover { animation-play-state: paused; }
+.carousel-track { 
+  display: flex; 
+  gap: 1rem; 
+  width: max-content; 
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
 .carousel-card { flex-shrink: 0; width: 300px; height: 220px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
 .carousel-card img { width: 100%; height: 100%; object-fit: cover; }
-@keyframes scroll-left { 0% { transform: translateX(0); } 100% { transform: translateX(calc(-50% - 0.5rem)); } }
+
+/* Reutilizando estilos de botões para o carrossel da frota */
+.carousel-wrapper .service-carousel-prev,
+.carousel-wrapper .service-carousel-next {
+  opacity: 1; /* Visíveis por padrão no wrapper se não estiverem escondidos pela lógica */
+  visibility: visible;
+}
