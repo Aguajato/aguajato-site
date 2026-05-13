@@ -221,7 +221,7 @@
         /* Stats */
         .stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 1.25rem;
             margin-bottom: 2rem;
         }
@@ -325,11 +325,6 @@
         .badge-green {
             background: var(--green-light);
             color: var(--green);
-        }
-
-        .badge-red {
-            background: var(--red-light);
-            color: var(--red);
         }
 
         .badge-brand {
@@ -594,11 +589,6 @@
                     <div class="value" id="stat-last" style="font-size:1rem; padding-top:.5rem;">—</div>
                     <div class="sub">período</div>
                 </div>
-                <div class="stat-card">
-                    <div class="label">Status</div>
-                    <div class="value" id="stat-status" style="font-size:1rem; padding-top:.5rem; color:var(--green);">✔ Normal</div>
-                    <div class="sub" id="stat-status-sub">todos aprovados</div>
-                </div>
             </div>
 
             <!-- Tabela -->
@@ -615,13 +605,12 @@
                                 <th>Período</th>
                                 <th>Tipo</th>
                                 <th>Arquivo PDF</th>
-                                <th>Resultado</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
                         <tbody id="laudos-tbody">
                             <tr>
-                                <td colspan="6" class="empty">
+                                <td colspan="5" class="empty">
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
                                         stroke="currentColor" stroke-width="1.5">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -666,13 +655,6 @@
                 <input type="file" id="m-arquivo" class="form-control" accept="application/pdf,.pdf">
                 <small id="m-arquivo-hint" style="font-size:.75rem; color:var(--slate-500); margin-top:.3rem; display:block;">Selecione o PDF do laudo (até 25 MB).</small>
             </div>
-            <div class="form-group">
-                <label class="form-label" for="m-resultado">Resultado</label>
-                <select id="m-resultado" class="form-control">
-                    <option value="Aprovado">Aprovado</option>
-                    <option value="Recusado">Recusado</option>
-                </select>
-            </div>
             <div class="modal-actions">
                 <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
                 <button class="btn btn-primary" id="btn-salvar" onclick="salvarLaudo()">Salvar Laudo</button>
@@ -716,43 +698,22 @@
             renderTable();
         }
 
-        function isRecusado(r) {
-            return /recusad/i.test(String(r ?? ''));
-        }
-
         function renderTable() {
             const tbody = document.getElementById('laudos-tbody');
             const total = laudos.length;
-            const recusados = laudos.filter(l => isRecusado(l.resultado)).length;
-            const aprovados = total - recusados;
 
             document.getElementById('stat-total').textContent = total;
             document.getElementById('table-count').textContent = total + ' laudo(s)';
             document.getElementById('stat-last').textContent = total ? laudos[0].periodo : '—';
 
-            const statusEl = document.getElementById('stat-status');
-            const statusSubEl = document.getElementById('stat-status-sub');
-            if (recusados === 0) {
-                statusEl.style.color = 'var(--green)';
-                statusEl.textContent = '✔ Normal';
-                statusSubEl.textContent = total ? `${aprovados} aprovado${aprovados !== 1 ? 's' : ''}` : 'sem laudos';
-            } else {
-                statusEl.style.color = 'var(--red)';
-                statusEl.textContent = '⚠️ Atenção';
-                statusSubEl.textContent = `${aprovados} aprovado${aprovados !== 1 ? 's' : ''} e ${recusados} recusado${recusados !== 1 ? 's' : ''}`;
-            }
-
             if (!total) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:3rem; color:#94a3b8;">
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:3rem; color:#94a3b8;">
           <svg xmlns="http://www.w3.org/2000/svg" width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin:0 auto 1rem;display:block;color:#cbd5e1;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           Nenhum laudo cadastrado. Clique em "Novo Laudo" para começar.
         </td></tr>`;
                 return;
             }
-            tbody.innerHTML = laudos.map(l => {
-                const recusado = isRecusado(l.resultado);
-                const badgeClass = recusado ? 'badge-red' : 'badge-green';
-                return `
+            tbody.innerHTML = laudos.map(l => `
         <tr>
           <td style="font-weight:600;">${escapeHtml(l.titulo)}</td>
           <td>${escapeHtml(l.periodo)}</td>
@@ -760,7 +721,6 @@
           <td style="font-family:monospace; font-size:.8rem;">
             <a href="${l.arquivo_url}" target="_blank" rel="noopener" style="color:#0284c7;">Ver PDF ↗</a>
           </td>
-          <td><span class="badge ${badgeClass}">${escapeHtml(l.resultado)}</span></td>
           <td>
             <div style="display:flex; gap:.4rem;">
               <button class="btn btn-ghost btn-sm" onclick="editLaudo('${l.id}')">Editar</button>
@@ -768,8 +728,7 @@
             </div>
           </td>
         </tr>
-      `;
-            }).join('');
+      `).join('');
         }
 
         function escapeHtml(s) {
@@ -786,7 +745,6 @@
                 document.getElementById('m-arquivo').value = '';
                 document.getElementById('m-arquivo').required = true;
                 document.getElementById('m-arquivo-hint').textContent = 'Selecione o PDF do laudo (até 25 MB).';
-                document.getElementById('m-resultado').value = 'Aprovado';
             }
             document.getElementById('modal-overlay').classList.add('is-open');
             setTimeout(() => document.getElementById('m-titulo').focus(), 100);
@@ -808,7 +766,6 @@
             document.getElementById('m-arquivo').value = '';
             document.getElementById('m-arquivo').required = false;
             document.getElementById('m-arquivo-hint').textContent = 'Deixe em branco para manter o PDF atual, ou selecione um novo para substituir.';
-            document.getElementById('m-resultado').value = l.resultado;
             openModal(true);
         }
 
@@ -824,7 +781,6 @@
             const tipo = document.getElementById('m-tipo').value;
             const fileInput = document.getElementById('m-arquivo');
             const file = fileInput.files[0];
-            const resultado = document.getElementById('m-resultado').value;
             const isEdit = editingId !== null;
 
             if (!titulo || !periodo) { alert('Preencha título e período.'); return; }
@@ -853,7 +809,7 @@
                 btn.textContent = 'Salvando...';
 
                 if (isEdit) {
-                    const updateData = { titulo, periodo, tipo, resultado };
+                    const updateData = { titulo, periodo, tipo };
                     if (arquivo_url) {
                         updateData.arquivo_url = arquivo_url;
                         updateData.arquivo_path = arquivo_path;
@@ -866,7 +822,7 @@
                     if (error) throw error;
                 } else {
                     const { error } = await sb.from(TABLE).insert({
-                        titulo, periodo, tipo, resultado, arquivo_url, arquivo_path
+                        titulo, periodo, tipo, arquivo_url, arquivo_path
                     });
                     if (error) throw error;
                 }
