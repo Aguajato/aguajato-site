@@ -43,6 +43,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -53,6 +54,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 img {
@@ -246,14 +248,14 @@ main {
 }
 
 .site-header.scrolled .logo-link img {
-  height: 38px !important;
+  height: 34px;
 }
 
 .header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
+  gap: 0.5rem;
   padding-top: 0.9rem;
   padding-bottom: 0.9rem;
 }
@@ -262,8 +264,17 @@ main {
 .logo-link {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 6px;
   flex-shrink: 0;
+  padding: 0.25rem 0;
+}
+
+.logo-link img {
+  height: 38px;
+  width: auto;
+  display: block;
+  object-fit: contain;
+  transition: height 0.3s ease;
 }
 
 .logo-icon {
@@ -1401,6 +1412,22 @@ textarea.form-control {
 }
 
 @media (min-width: 768px) {
+  .header-inner {
+    gap: 1.5rem;
+  }
+
+  .logo-link {
+    gap: 8px;
+  }
+
+  .logo-link img {
+    height: 52px;
+  }
+
+  .site-header.scrolled .logo-link img {
+    height: 38px;
+  }
+
   .topbar {
     display: block;
   }
@@ -1540,4 +1567,25 @@ textarea.form-control {
 .carousel-wrapper .service-carousel-next {
   opacity: 1; /* Visíveis por padrão no wrapper se não estiverem escondidos pela lógica */
   visibility: visible;
+}
+
+/* ── MOBILE TWEAKS (UNDER 480PX) ── */
+@media (max-width: 480px) {
+  .hero-badge {
+    font-size: 0.72rem !important;
+    padding: 0.35rem 0.75rem !important;
+    max-width: 100%;
+    line-height: 1.3;
+  }
+  .btn {
+    padding: 0.75rem 1.25rem !important;
+    font-size: 0.85rem !important;
+  }
+  .btn-lg {
+    padding: 0.85rem 1.5rem !important;
+    font-size: 0.9rem !important;
+  }
+  .hero-actions {
+    gap: 0.5rem;
+  }
 }
