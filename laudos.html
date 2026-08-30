@@ -39,6 +39,7 @@
     <script src="js/main.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-config.js"></script>
+    <script src="js/laudos-grouping.js"></script>
     <style>
         .laudos-grid {
             display: grid;
@@ -153,6 +154,61 @@
             border-color: var(--brand);
             color: #fff;
         }
+
+        .laudos-ano-titulo {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--slate-900);
+            background: var(--brand-light);
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.75rem;
+        }
+
+        .laudos-tabela {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .laudos-tabela th {
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--slate-500);
+            padding: 0.6rem 0.75rem;
+            border-bottom: 2px solid var(--slate-200);
+        }
+
+        .laudos-tabela td {
+            padding: 0.65rem 0.75rem;
+            border-bottom: 1px solid var(--slate-100);
+            color: var(--slate-700);
+            vertical-align: top;
+        }
+
+        .laudos-tabela td.mes-nome {
+            font-weight: 700;
+            color: var(--slate-900);
+            white-space: nowrap;
+            text-transform: capitalize;
+        }
+
+        .laudos-tabela a {
+            color: var(--brand);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .laudos-tabela a:hover {
+            text-decoration: underline;
+        }
+
+        .laudos-tabela .sem-links {
+            color: var(--slate-400);
+        }
     </style>
 </head>
 
@@ -247,9 +303,8 @@
                 </div>
 
                 <div class="laudos-filters" id="laudos-filters">
-                    <button type="button" class="laudo-filter-btn active" data-filter="Todos">Todos</button>
-                    <button type="button" class="laudo-filter-btn" data-filter="Desinfecção">Desinfecção</button>
-                    <button type="button" class="laudo-filter-btn" data-filter="Fisico químicos/orgabolépticos">Fisico químicos/orgabolépticos</button>
+                    <button type="button" class="laudo-filter-btn active" data-filter="Desinfecção">Desinfecção</button>
+                    <button type="button" class="laudo-filter-btn" data-filter="Fisico químicos/orgabolépticos">Físico-Químicos/Organolépticos</button>
                     <button type="button" class="laudo-filter-btn" data-filter="Portaria GM/MS n 888">Portaria GM/MS n 888</button>
                 </div>
 
@@ -270,30 +325,21 @@
         );
 
         window.allLaudos = [];
-        let currentFilter = 'Todos';
+        let currentTab = 'Desinfecção';
 
         function escapeHtml(s) {
             return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         }
 
-        function renderLaudosFiltrados(filtroSelecionado) {
-            const container = document.getElementById('laudos-list');
-            const counter = document.getElementById('laudo-count');
-            const lista = filtroSelecionado === 'Todos'
-                ? window.allLaudos
-                : window.allLaudos.filter(l => l.tipo === filtroSelecionado);
+        function emptyStateHtml(mensagem) {
+            return `<div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <p>${mensagem}</p>
+        </div>`;
+        }
 
-            counter.textContent = lista.length + ' laudo' + (lista.length !== 1 ? 's' : '') + ' disponível' + (lista.length !== 1 ? 'is' : '');
-
-            if (!lista.length) {
-                container.innerHTML = `<div class="empty-state">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            <p>${filtroSelecionado === 'Todos' ? 'Nenhum laudo publicado ainda.' : 'Nenhum laudo desta categoria.'}</p>
-          </div>`;
-                return;
-            }
-
-            container.innerHTML = lista.map(l => `
+        function renderListaSimples(lista) {
+            return lista.map(l => `
           <div class="laudo-card">
             <div class="laudo-icon" style="background:var(--brand-light);color:var(--brand);">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
@@ -303,13 +349,66 @@
               <div class="laudo-meta">📅 ${escapeHtml(l.periodo)} · ${escapeHtml(l.tipo)}</div>
             </div>
             <div class="laudo-actions">
-              <a href="${l.arquivo_url}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
+              <a href="${escapeHtml(l.arquivo_url)}" target="_blank" rel="noopener" class="btn btn-primary btn-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
                 Baixar
               </a>
             </div>
           </div>
         `).join('');
+        }
+
+        function anchorsHtml(items) {
+            if (!items.length) return '<span class="sem-links">—</span>';
+            return items.map(i => `<a href="${escapeHtml(i.arquivo_url)}" target="_blank" rel="noopener">${escapeHtml(i.base)}</a>`).join(' | ');
+        }
+
+        function renderTabelaAnoMes(lista, colunas) {
+            const anos = LaudosGrouping.agruparPorAnoMes(lista);
+            return anos.map(grupoAno => {
+                const linhas = grupoAno.meses.map(grupoMes => {
+                    const celulas = colunas.map(col => {
+                        const links = LaudosGrouping.linksPorBase(grupoMes.laudos, col.frequencia);
+                        return `<td>${anchorsHtml(links)}</td>`;
+                    }).join('');
+                    const rotuloMes = grupoMes.mes ? `${grupoMes.mesNome}/${grupoAno.ano}` : grupoMes.mesNome;
+                    return `<tr><td class="mes-nome">${escapeHtml(rotuloMes)}</td>${celulas}</tr>`;
+                }).join('');
+
+                const cabecalho = `<tr><th>Mês</th>${colunas.map(c => `<th>${escapeHtml(c.titulo)}</th>`).join('')}</tr>`;
+                const tituloAno = grupoAno.ano ? `Período ${grupoAno.ano}` : 'Outros períodos';
+
+                return `<div class="laudos-ano">
+            <div class="laudos-ano-titulo">${escapeHtml(tituloAno)}</div>
+            <table class="laudos-tabela"><thead>${cabecalho}</thead><tbody>${linhas}</tbody></table>
+          </div>`;
+            }).join('');
+        }
+
+        function enriquecerComBaseFrequencia(lista) {
+            return lista.map(l => Object.assign({}, l, LaudosGrouping.inferirBaseFrequencia(l.titulo)));
+        }
+
+        function render() {
+            const container = document.getElementById('laudos-list');
+            const counter = document.getElementById('laudo-count');
+            const lista = window.allLaudos.filter(l => l.tipo === currentTab);
+            const listaEnriquecida = enriquecerComBaseFrequencia(lista);
+
+            counter.textContent = lista.length + ' laudo' + (lista.length !== 1 ? 's' : '') + ' disponível' + (lista.length !== 1 ? 'is' : '');
+
+            if (currentTab === 'Desinfecção') {
+                container.innerHTML = listaEnriquecida.length ? renderListaSimples(listaEnriquecida) : emptyStateHtml('Nenhum laudo desta categoria.');
+            } else if (currentTab === 'Fisico químicos/orgabolépticos') {
+                container.innerHTML = renderTabelaAnoMes(listaEnriquecida, [
+                    { titulo: 'Laudos Diário (por base)', frequencia: 'Diário' },
+                    { titulo: 'Laudos Mensais (por base)', frequencia: 'Mensal' }
+                ]);
+            } else if (currentTab === 'Portaria GM/MS n 888') {
+                container.innerHTML = renderTabelaAnoMes(listaEnriquecida, [
+                    { titulo: 'Links dos Laudos Semestral (por base)', frequencia: 'Semestral' }
+                ]);
+            }
         }
 
         async function loadLaudos() {
@@ -332,7 +431,7 @@
             }
 
             window.allLaudos = data || [];
-            renderLaudosFiltrados(currentFilter);
+            render();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -341,8 +440,8 @@
                 if (!btn) return;
                 document.querySelectorAll('.laudo-filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                currentFilter = btn.dataset.filter;
-                renderLaudosFiltrados(currentFilter);
+                currentTab = btn.dataset.filter;
+                render();
             });
             loadLaudos();
         });

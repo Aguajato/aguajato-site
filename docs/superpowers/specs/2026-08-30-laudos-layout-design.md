@@ -3,6 +3,18 @@
 **Data:** 2026-08-30
 **Status:** Aprovado pelo cliente (via perguntas interativas)
 
+**Revisão (2026-08-30, mesmo dia):** a Decisão 1 original (adicionar colunas
+`base`/`frequencia` no Supabase) foi revertida. Não há acesso, neste momento,
+ao painel do Supabase (supabase.com) para rodar o `ALTER TABLE` necessário —
+a chave anônima usada pelo site (`js/supabase-config.js`) fala com o banco
+via PostgREST, que só expõe CRUD nas tabelas existentes, nunca DDL. Sem
+acesso ao SQL Editor ou à connection string direta do Postgres, não há como
+aplicar essa migração. A solução passou a ser: **inferir base e frequência
+direto do campo `titulo`, em tempo de renderização, na própria página
+pública** — reaproveitando a função `inferirBaseFrequencia` (já escrita e
+testada para o botão de auto-preenchimento do admin, que deixou de existir).
+Ver seção "Decisão revisada" abaixo.
+
 ## Contexto
 
 O cliente pediu para a página `/laudos` voltar a exibir os laudos como no site
@@ -41,13 +53,29 @@ arquivo_path, created_at`. Não existem colunas para "base" nem "frequência"
 O campo `resultado` (ex: `"✔ Aprovado"`) existe mas não é usado em nenhuma
 tela hoje e **fica fora do escopo** desta mudança.
 
+## Decisão revisada (substitui a Decisão 1 original)
+
+**Sem alteração de schema.** `base` e `frequencia` NÃO são colunas no banco
+— são calculadas no navegador, a partir do `titulo` de cada laudo, usando
+`LaudosGrouping.inferirBaseFrequencia(titulo)` (`js/laudos-grouping.js`),
+toda vez que a página `/laudos` carrega os dados. O admin volta a ser
+exatamente como era antes desta feature (sem campos Base/Frequência, sem
+botão de auto-preenchimento) — só cadastra título/período/tipo/arquivo,
+como sempre fez.
+
+**Risco aceito:** se um laudo for cadastrado com um `titulo` fora dos
+padrões reconhecidos (ver lista de padrões abaixo), `inferirBaseFrequencia`
+retorna `{base: null, frequencia: null}` e esse laudo não aparece na tabela
+agrupada daquela categoria (fica só contado no total, mas invisível nas
+colunas de Diário/Mensal/Semestral). Não há aviso automático disso no
+admin — quem cadastra o laudo precisa seguir o padrão de nomenclatura já
+usado nos títulos atuais (`MENSAL_<BASE>_...`, `DIARIOS_<BASE>_...`,
+`SEMESTRAL_<BASE>_...`).
+
 ## Decisões (confirmadas com o cliente)
 
-1. **Schema**: adicionar duas colunas novas em `aguajato_laudos`:
-   `base` (text, nullable) e `frequencia` (text, nullable). O admin passa a
-   ter selects para preencher esses dois campos ao cadastrar/editar um
-   laudo. Motivo: parsing por regex do `titulo` livre é frágil — se alguém
-   digitar fora do padrão, o laudo não seria agrupado corretamente.
+1. ~~Schema: adicionar colunas `base`/`frequencia` no Supabase~~ —
+   **revertido**, ver "Decisão revisada" acima.
 2. **Bases fixas** (nesta ordem, igual ao print antigo): `Bela`, `Polo`,
    `RPR`, `Apress`.
 3. **Frequências possíveis**: `Diário`, `Mensal`, `Semestral` (mais `—` /
@@ -95,19 +123,15 @@ Tabela agrupada por ano → mês, com uma única coluna **Links dos Laudos
 Semestral (por base)** — links das bases com `frequencia = Semestral`
 naquele mês, unidos com ` | `.
 
-## Migração dos dados existentes
+## Inferência de base/frequência a partir do título
 
 Os 34 registros atuais seguem padrões de `titulo` bem definidos o
 suficiente para inferir `base` e `frequencia` automaticamente (ex:
-`MENSAL_POLO_2026_06` → base=Polo, frequencia=Mensal). Em vez de pedir para
-o cliente reclassificar cada laudo manualmente, o painel admin ganha um
-botão único **"Preencher Base/Frequência automaticamente"** que roda esse
-reconhecimento de padrão nos registros que ainda não têm `base`/`frequencia`
-preenchidos e atualiza em lote (usando a sessão autenticada do admin, já que
-a anon key sozinha não tem permissão de update). O cliente pode revisar e
-corrigir manualmente pela tabela do admin depois.
+`MENSAL_POLO_2026_06` → base=Polo, frequencia=Mensal), sem precisar de
+nenhuma reclassificação manual: a inferência roda a cada carregamento da
+página pública, direto sobre o `titulo` já salvo.
 
-Padrões reconhecidos pela auto-preencher:
+Padrões reconhecidos por `inferirBaseFrequencia`:
 - `MENSAL_<BASE>_...` → Mensal
 - `DIARIOS_<BASE>_...` / `PLANILHAS DIARIAS-<BASE...>` → Diário
 - `SEMESTRAL_<BASE>_...` → Semestral
@@ -123,14 +147,7 @@ Padrões reconhecidos pela auto-preencher:
 - Qualquer alteração de estilo visual/cores fora da seção "Laudos
   Disponíveis".
 
-## Pré-requisito manual (fora do controle do código)
+## Pré-requisito manual
 
-Como não há acesso de service-role/CLI do Supabase neste ambiente, o
-cliente (ou quem tiver acesso ao painel do Supabase) precisa rodar este SQL
-uma vez, antes do deploy da mudança de admin/site:
-
-```sql
-alter table aguajato_laudos
-  add column if not exists base text,
-  add column if not exists frequencia text;
-```
+Nenhum. Não há migração de banco para rodar — essa foi justamente a razão
+da revisão de decisão acima.
