@@ -691,7 +691,7 @@
             const tbody = document.getElementById('laudos-tbody');
             const { data, error } = await sb.from(TABLE).select('*').order('created_at', { ascending: false });
             if (error) {
-                tbody.innerHTML = `<tr><td colspan="6" class="empty" style="color:var(--red);">Erro ao carregar laudos: ${error.message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="5" class="empty" style="color:var(--red);">Erro ao carregar laudos: ${error.message}</td></tr>`;
                 return;
             }
             laudos = data || [];
